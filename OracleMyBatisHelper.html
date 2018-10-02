@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mybatis Helper</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+        var ibatisToOracle = function (e) {
+            e.preventDefault();
+            var query = $(this).val();
+            var pattern1 = /(#)([^#]{1,})(#)/gi;
+            var pattern2 = /(<!\[CDATA\[)/gi;
+            var pattern3 = /(\]\]>)/gi;
+            $("#out").val(query.replace(pattern2, "").replace(pattern3, "").replace(pattern1, replaceToOracle));
+        }
+        var OracleToibatis = function (e) {
+            e.preventDefault();
+            var query = $(this).val();
+            var pattern1 = /(:)([^:][^ ]{1,})/gi;
+            var pattern2 = /([>=]{2}|[<=]{2}|[<>]{2}|[>]{1}|[<]{1})/gi;
+            var pattern3 = /(\]\]>)/gi;
+            $("#out").val(query.replace(pattern2, replaceToIbatis2).replace(pattern1, replaceToIbatis1));
+        }
+
+        function replaceToOracle(match, p1, p2, offset, string) {
+            return ":" + p2;
+        }
+
+        function replaceToIbatis1(match, p1, p2, offset, string) {
+            return "#" + p2 + "#";
+        }
+
+        function replaceToIbatis2(match, p1, p2, offset, string) {
+            return "<![CDATA[" + p1 + "]]>";
+        }
+
+        $(document).ready(function () {
+            $("#inoutChange").on('click', function () {
+                var temp = $('#inText').html();
+                var cb;
+                $('#inText').html($('#outText').html());
+                $('#outText').html(temp);
+                $("#in").val('');
+                $("#out").val('');
+                if (temp == 'Ibatis') {
+                    cb = OracleToibatis;
+                } else if (temp == 'Oracle') {
+                    cb = ibatisToOracle;
+                }
+                $("#in").off('change').change(cb);
+            });
+
+            $("#in").change(ibatisToOracle);
+        });
+
+
+    </script>
+</head>
+<body>
+    <div>
+        <div id="input" style="display:inline-block;text-align:center;">
+            <div id="inText" style="font-size: 23px;">Ibatis</div>
+            <textarea id="in" rows="70" cols="100"></textarea>
+        </div>
+        <div style="display:inline-block;vertical-align: top;margin-top: 20%;">
+            <input id="inoutChange" type="button" value="<->" style="width:80px; height:40px;" />
+        </div>
+        <div id="output" style="display:inline-block;text-align:center;">
+            <div id="outText" style="font-size: 23px;">Oracle</div>
+            <textarea id="out" rows="70" cols="100"></textarea>
+        </div>
+    </div>
+</body>
+</html>
